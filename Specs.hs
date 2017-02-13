@@ -32,3 +32,9 @@ main = hspec $ do
             gsSort (join [a,b,d,c]) `shouldBe` (gsSort [a',b])
     
             (gsSort (join [a,b])) `shouldBe` (gsSort [a,b])
+
+    describe "change" $ do
+        it "changes the color of an area" $ do
+            let g = join (change (0,1) Brown [a,b,c,d]) 
+            (gsSort g) `shouldBe` (gsSort [(Brown,[(0,0),(1,0),(0,1),(0,2),(1,1),(1,2),(0,2),(1,2)])])
+            

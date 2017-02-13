@@ -28,3 +28,9 @@ join [a] = [a]
 join (a:b:as) = case touch a b of
     True -> join ((color a, squares a ++ squares b):join as)
     False -> (b:join (a:join as))
+
+change :: Coords -> Color -> GameState -> GameState
+change _ _ [] = []
+change (x,y) c ((c',sq):as) = case (x,y) `elem` sq of
+    True -> (c,sq):as
+    False -> (c',sq):change (x,y) c as
