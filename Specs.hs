@@ -35,7 +35,7 @@ main = hspec $ do
 
     describe "change" $ do
         it "changes the color of an area" $ do
-            let g = join (change (0,1) Brown [a,b,c,d]) 
+            let g = join (change (Brown,(0,1)) [a,b,c,d]) 
             (gsSort g) `shouldBe` (gsSort [(Brown,[(0,0),(1,0),(0,1),(0,2),(1,1),(1,2),(0,2),(1,2)])])
 
     describe "moves" $ do
@@ -46,4 +46,13 @@ main = hspec $ do
                 ,(Brown,(0,1)),(Blue,(0,1))
                 ,(Red,(1,1)),(Blue,(1,1))
                 ,(Brown,(0,2)),(Red,(0,2))]
+
+    describe "solve" $ do 
+        it "solves the game for a given number of moves" $ do
+            (solve 1 [(Red,[(0,0)]),(Brown,[(1,0)])]) `shouldBe` [(0,(Brown,(0,0))),(0,(Red,(1,0)))] 
+            (solve 1 [(Red,[(0,0)]),(Brown,[(1,0)]),(Red,[(2,0)])]) `shouldBe` [(0,(Red,(1,0)))] 
+            (solve 1 [(Blue,[(0,0)]),(Brown,[(1,0)]),(Red,[(2,0)])]) `shouldBe` []
+            (solve 2 [(Blue,[(0,0)]),(Brown,[(1,0)]),(Red,[(2,0)])]) `shouldBe` 
+                []
+
             
