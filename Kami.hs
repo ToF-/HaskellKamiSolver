@@ -25,12 +25,10 @@ squares = snd
 join :: GameState -> GameState
 join []  = []
 join [a] = [a]
-join (a:b:as) = case touch a b of
-    True -> join ((color a, squares a ++ squares b):join as)
-    False -> (b:join (a:join as))
+join (a:b:as) | touch a b = join ((color a, squares a ++ squares b):join as)
+              | otherwise = b:join (a:join as)
 
 change :: Coords -> Color -> GameState -> GameState
 change _ _ [] = []
-change (x,y) c ((c',sq):as) = case (x,y) `elem` sq of
-    True -> (c,sq):as
-    False -> (c',sq):change (x,y) c as
+change (x,y) c ((c',sq):as) | (x,y) `elem` sq = (c,sq):as
+                            | otherwise       = (c',sq):change (x,y) c as
