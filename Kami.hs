@@ -1,10 +1,11 @@
 module Kami
 where
+import Data.List
 
 type GameState = [Area]
 type Area = (Color,[Coords])
 type Coords = (Int,Int)
-data Color = Brown | Red
+data Color = Brown | Red | Blue
     deriving (Eq, Ord, Show)
 
 success :: GameState -> Bool
@@ -32,3 +33,7 @@ change :: Coords -> Color -> GameState -> GameState
 change _ _ [] = []
 change (x,y) c ((c',sq):as) | (x,y) `elem` sq = (c,sq):as
                             | otherwise       = (c',sq):change (x,y) c as
+
+moves :: GameState -> [(Color,Coords)]
+moves g = concatMap (\(c,sq) -> [(c',head sq) | c' <- colors g, c' /= c]) g
+    where colors = nub . sort . map color 

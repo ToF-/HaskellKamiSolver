@@ -37,4 +37,13 @@ main = hspec $ do
         it "changes the color of an area" $ do
             let g = join (change (0,1) Brown [a,b,c,d]) 
             (gsSort g) `shouldBe` (gsSort [(Brown,[(0,0),(1,0),(0,1),(0,2),(1,1),(1,2),(0,2),(1,2)])])
+
+    describe "moves" $ do
+        it "gives all the possible changes of a game state" $ do
+            let d' = (Blue,[(0,2),(1,2)])
+            moves [a,b,c,d']  `shouldBe` 
+                [(Red,(0,0)),(Blue,(0,0))
+                ,(Brown,(0,1)),(Blue,(0,1))
+                ,(Red,(1,1)),(Blue,(1,1))
+                ,(Brown,(0,2)),(Red,(0,2))]
             
