@@ -5,22 +5,26 @@ type GameState = [Area]
 type Area = (Color,[Coords])
 type Coords = (Int,Int)
 data Color = Brown | Red
-    deriving (Eq, Show)
+    deriving (Eq, Ord, Show)
 
 success :: GameState -> Bool
 success = (1==) . length
 
+touch :: Area -> Area -> Bool
+touch a b | color a /= color b = False
+touch a b = any (\cd -> any (\cd' -> cd `near` cd') (squares b)) (squares a)  
+    where 
+    near (x,y) (x',y') = dx * dy == 0 && dx + dy == 1
+        where 
+        dx = abs (x - x')
+        dy = abs (y - y')
+
 color = fst
 squares = snd
 
-join :: Area -> Area -> Area
-join a b | (color a == color b) && any (neighbor (squares b)) (squares a) = (color a,squares a ++ squares b)
-         | otherwise = a
-    where
-    neighbor :: [Coords] -> Coords -> Bool
-    neighbor cs c = any (touches c) cs
-        where
-        touches (x,y) (x',y') = dx*dy == 0 && dx+dy == 1
-            where
-            dx = abs (x-x')
-            dy = abs (y-y')
+join :: GameState -> GameState
+join []  = []
+join [a] = [a]
+join (a:b:as) = case touch a b of
+    True -> join ((color a, squares a ++ squares b):as)
+    False -> (b:join (a:as))
