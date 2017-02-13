@@ -5,7 +5,9 @@ import Kami
 a = (Brown,[(0,0),(1,0)])
 b = (Red,  [(0,1),(0,2)])
 c = (Brown,[(1,1),(1,2)])
-d = (Brown,[(0,2),(2,2)])
+d = (Brown,[(0,2),(1,2)])
+
+gsSort = sort . map (\(c,sq)-> (c,sort sq))
 
 main = hspec $ do
     describe "touch" $ do
@@ -26,5 +28,7 @@ main = hspec $ do
     
     describe "merge" $ do
         it "join areas that touch together and are of same color" $ do
-            let a' = (Brown,[(0,0),(1,0),(1,1),(1,2),(0,2),(2,2)])
-            sort (join [a,b,c,d]) `shouldBe` (sort [a',b])
+            let a' = (Brown,[(0,0),(1,0),(1,1),(1,2),(0,2),(1,2)])
+            gsSort (join [a,b,d,c]) `shouldBe` (gsSort [a',b])
+    
+            (gsSort (join [a,b])) `shouldBe` (gsSort [a,b])

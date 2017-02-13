@@ -26,5 +26,5 @@ join :: GameState -> GameState
 join []  = []
 join [a] = [a]
 join (a:b:as) = case touch a b of
-    True -> join ((color a, squares a ++ squares b):as)
-    False -> (b:join (a:as))
+    True -> join ((color a, squares a ++ squares b):join as)
+    False -> (b:join (a:join as))
