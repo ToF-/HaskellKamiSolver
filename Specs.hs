@@ -32,3 +32,16 @@ main = hspec $ do
                                ,"..@"]))) `shouldBe` ["##." 
                                                      ,"#.."
                                                      ,"..@"]
+
+    describe "play" $ do
+        it "changes the color of an area" $ do
+            let g = game ["##."
+                         ,"#@."
+                         ,"..@"]
+                g' = play g ((1,1),Blue)
+            (lines (text g')) `shouldBe` ["##."  
+                                         ,"#.."
+                                         ,"..@"]
+            length g  `shouldBe` 5
+            length g' `shouldBe` 3
+

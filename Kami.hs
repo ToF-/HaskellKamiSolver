@@ -10,7 +10,7 @@ data Color = Brown | Blue | Cyan | Orange | Green | Red | White | Yellow
     deriving (Eq,Ord,Show)
 
 game :: [String] -> GameState
-game = sort . map sort . join . singletons . mapGame
+game = join . singletons . mapGame
     where
     index :: [a] -> [(Integer,a)]
     index = zip [0..]
@@ -53,10 +53,14 @@ touch a b = any (\cd -> any (\cd' -> cd `near` cd') (squares b)) (squares a)
         dy = abs (y - y')
 
 join :: GameState -> GameState
-join []  = []
-join [a] = [a]
-join (a:b:as) | touch a b = join ((a++b):join as)
-              | otherwise = b:join (a:join as)
+join = sort . map sort . join'
+
+join' :: GameState -> GameState
+join' []  = []
+join' [a] = [a]
+join' (a:as) = [concat js ++ a] ++ ns
+    where
+    (js,ns) = partition (touch a) (join' as) 
 
 text :: GameState -> String
 text = output 
@@ -66,3 +70,10 @@ text = output
     same f a b = f a == f b
     toString = map (colorToChar . color)
     output = unlines . map toString . groupBy (same y) . sortBy (comparing y) . concat
+
+play :: GameState -> (Coord,Color) -> GameState
+play g m = sort (map sort (join (map (changeAt m) g)))
+    where
+    changeAt (yx,c) a = case lookup yx a of
+        Just c' -> map (\(cd,_) -> (cd,c)) a
+        Nothing -> a
