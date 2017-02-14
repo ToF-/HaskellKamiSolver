@@ -2,10 +2,12 @@ module Kami
 where
 import Data.List
 import Data.Ord
+import Data.Maybe
 
 type GameState = [Area]
 type Area = [(Coord,Color)]
 type Coord = (Integer,Integer)
+type Move = (Coord,Color)
 data Color = Brown | Blue | Cyan | Orange | Green | Red | White | Yellow 
     deriving (Eq,Ord,Show)
 
@@ -72,14 +74,41 @@ text = output
     toString = map (colorToChar . color)
     output = unlines . map toString . groupBy (same y) . sortBy (comparing yx) . concat
 
-play :: GameState -> (Coord,Color) -> GameState
+play :: GameState -> Move -> GameState
 play g m = sort (map sort (join (map (changeAt m) g)))
     where
     changeAt (yx,c) a = case lookup yx a of
         Just c' -> map (\(cd,_) -> (cd,c)) a
         Nothing -> a
 
-moves :: GameState -> [(Coord,Color)]
+moves :: GameState -> [Move]
 moves g = concatMap (\a -> [(fst (head a),c) | c <- colors, c /= snd (head a)]) g
     where
     colors = nub $ sort $ map color g
+
+success = (1==) . length
+
+data MoveTree = Success Int Move (Maybe MoveTree) 
+              | Fail 
+    deriving (Eq,Ord,Show)
+
+eval :: GameState -> Int -> Move -> MoveTree
+eval g 1 m | success (play g m) = Success 1 m Nothing
+           | otherwise          = Fail
+eval g n m | success (play g m) = Success 1 m Nothing
+eval g n m = 
+    let g' = play g m
+        ms = map (eval g' (n-1)) (moves g')
+    in case minimum ms of
+        Fail -> Fail
+        (Success n' m' ms') -> Success (n'+1) m (Just (Success n' m' ms'))
+
+result :: MoveTree -> [Move]
+result Fail = []
+result (Success 1 m Nothing) = [m]
+result (Success n m (Just ms)) = m : result ms
+
+solve :: GameState -> Int -> [Move]
+solve g n = minimum (sortBy (comparing length) (map (result . (eval g n)) (moves g)))
+        
+          
