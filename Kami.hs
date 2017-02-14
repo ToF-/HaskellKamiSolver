@@ -1,6 +1,7 @@
 module Kami
 where
 import Data.List
+import Data.Ord
 
 type GameState = [Area]
 type Area = [(Coord,Color)]
@@ -15,7 +16,7 @@ game = sort . map sort . join . singletons . mapGame
     index = zip [0..]
 
     coordx :: Integer -> [a] -> [(Coord,a)]
-    coordx y s = [((x,y),c)  | (x,c) <- index s]
+    coordx y s = [((y,x),c)  | (x,c) <- index s]
 
     coordy :: [[a]] -> [[(Coord,a)]]
     coordy  ss = [coordx y s | (y,s) <- index ss]
@@ -32,6 +33,13 @@ charToColor '.' = Blue
 charToColor '*' = Orange
 charToColor '@' = Red
 
+colorToChar :: Color -> Char
+colorToChar Brown = '#'
+colorToChar Blue  = '.'
+colorToChar Orange = '*'
+colorToChar Red = '@'
+
+
 color = snd . head
 squares = map fst
 
@@ -39,7 +47,7 @@ touch :: Area -> Area -> Bool
 touch a b | color a /= color b = False
 touch a b = any (\cd -> any (\cd' -> cd `near` cd') (squares b)) (squares a)  
     where 
-    near (x,y) (x',y') = dx * dy == 0 && dx + dy == 1
+    near (y,x) (y',x') = dx * dy == 0 && dx + dy == 1
         where 
         dx = abs (x - x')
         dy = abs (y - y')
@@ -50,5 +58,11 @@ join [a] = [a]
 join (a:b:as) | touch a b = join ((a++b):join as)
               | otherwise = b:join (a:join as)
 
-
-
+text :: GameState -> String
+text = output 
+    where
+    color = snd
+    y = fst . fst
+    same f a b = f a == f b
+    toString = map (colorToChar . color)
+    output = unlines . map toString . groupBy (same y) . sortBy (comparing y) . concat
