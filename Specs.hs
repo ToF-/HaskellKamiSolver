@@ -27,11 +27,13 @@ main = hspec $ do
                                     ,[((2,2),Red)]]
     describe "text" $ do
         it "outputs a text display of a game" $ do
-            (lines (text (game ["##." 
-                               ,"#.."
-                               ,"..@"]))) `shouldBe` ["##." 
-                                                     ,"#.."
-                                                     ,"..@"]
+            let t = ["##." 
+                    ,"#.."
+                    ,"..@"]
+            (lines (text (game t))) `shouldBe` t
+            let t = ["###.#@"
+                    ,"@@###@"]
+            (lines (text (game t))) `shouldBe` t
 
     describe "play" $ do
         it "changes the color of an area" $ do

@@ -11,21 +11,21 @@ data Color = Brown | Blue | Cyan | Orange | Green | Red | White | Yellow
 
 game :: [String] -> GameState
 game = join . singletons . mapGame
-    where
-    index :: [a] -> [(Integer,a)]
-    index = zip [0..]
 
-    coordx :: Integer -> [a] -> [(Coord,a)]
-    coordx y s = [((y,x),c)  | (x,c) <- index s]
+index :: [a] -> [(Integer,a)]
+index = zip [0..]
 
-    coordy :: [[a]] -> [[(Coord,a)]]
-    coordy  ss = [coordx y s | (y,s) <- index ss]
-    
-    singletons :: [[a]] -> [[a]]
-    singletons = concatMap (map return)
+coordx :: Integer -> [a] -> [(Coord,a)]
+coordx y s = [((y,x),c)  | (x,c) <- index s]
 
-    mapGame :: [[Char]] -> GameState
-    mapGame = singletons . coordy . map (map charToColor)
+coordy :: [[a]] -> [[(Coord,a)]]
+coordy  ss = [coordx y s | (y,s) <- index ss]
+
+singletons :: [[a]] -> [[a]]
+singletons = concatMap (map return)
+
+mapGame :: [[Char]] -> GameState
+mapGame = singletons . coordy . map (map charToColor)
 
 charToColor :: Char -> Color
 charToColor '#' = Brown
@@ -66,10 +66,11 @@ text :: GameState -> String
 text = output 
     where
     color = snd
+    yx = fst
     y = fst . fst
     same f a b = f a == f b
     toString = map (colorToChar . color)
-    output = unlines . map toString . groupBy (same y) . sortBy (comparing y) . concat
+    output = unlines . map toString . groupBy (same y) . sortBy (comparing yx) . concat
 
 play :: GameState -> (Coord,Color) -> GameState
 play g m = sort (map sort (join (map (changeAt m) g)))
