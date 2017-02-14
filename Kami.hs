@@ -77,3 +77,8 @@ play g m = sort (map sort (join (map (changeAt m) g)))
     changeAt (yx,c) a = case lookup yx a of
         Just c' -> map (\(cd,_) -> (cd,c)) a
         Nothing -> a
+
+moves :: GameState -> [(Coord,Color)]
+moves g = concatMap (\a -> [(fst (head a),c) | c <- colors, c /= snd (head a)]) g
+    where
+    colors = nub $ sort $ map color g

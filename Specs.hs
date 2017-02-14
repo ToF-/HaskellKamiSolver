@@ -45,3 +45,12 @@ main = hspec $ do
             length g  `shouldBe` 5
             length g' `shouldBe` 3
 
+    describe "moves" $ do
+        it "gives all possible moves for a game state" $ do
+            moves (game ["#"])  `shouldBe` [] 
+            moves (game ["#."]) `shouldBe` [((0,0),Blue),((0,1),Brown)]
+            moves (game ["#.@"]) `shouldBe` [((0,0),Blue),((0,0),Red)
+                                            ,((0,1),Brown),((0,1),Red)
+                                            ,((0,2),Brown),((0,2),Blue)]
+            
+
